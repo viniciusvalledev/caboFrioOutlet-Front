@@ -1,20 +1,208 @@
-<header class="w-full bg-black/95 backdrop-blur-md">
-  <div class="mx-auto flex h-20 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
-    <a href="#" class="flex flex-shrink-0 items-center gap-2.5 text-white">
-      <span class="flex h-9 w-9 items-center justify-center rounded-sm border border-accent/50 text-[11px] font-mono font-bold tracking-tight text-accent">
+<header class="w-full border-b border-slate-200 bg-white/95 backdrop-blur-md">
+  <div class="hidden border-b border-slate-200 sm:block">
+    <div class="mx-auto flex h-9 max-w-7xl items-center justify-between px-4 text-[11px] font-medium text-slate-500 sm:px-6 lg:px-8">
+      <a
+        [href]="whatsappUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex items-center gap-1.5 transition-colors duration-300 hover:text-slate-900"
+      >
+        <lucide-icon [img]="MessageCircle" class="h-3.5 w-3.5" />
+        Fale conosco
+      </a>
+
+      <div class="flex items-center gap-5">
+        <a
+          [href]="correiosTrackingUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center gap-1.5 transition-colors duration-300 hover:text-slate-900"
+        >
+          <lucide-icon [img]="Truck" class="h-3.5 w-3.5" />
+          Rastrear pedido
+        </a>
+        <div class="flex items-center gap-3">
+          <a [href]="instagramUrl" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="transition-colors duration-300 hover:text-slate-900">
+            <lucide-icon [img]="Instagram" class="h-3.5 w-3.5" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mx-auto flex h-20 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+    <a href="#" class="flex flex-shrink-0 items-center gap-2.5 text-slate-900">
+      <span class="flex h-9 w-9 items-center justify-center rounded-sm border border-slate-900 text-[11px] font-mono font-bold tracking-tight text-slate-900">
         {{ storeInitials(settingsService.settings().storeName) }}
       </span>
       <span class="hidden font-display text-lg font-semibold uppercase tracking-tight sm:inline">
         {{ wordmark().lead ? wordmark().lead + ' ' : '' }}
-        <span class="text-accent">{{ wordmark().accent }}</span>
+        <span class="bg-accent px-1 text-black">{{ wordmark().accent }}</span>
       </span>
     </a>
 
-    <nav class="hidden flex-1 items-center justify-center gap-8 md:flex">
+    <div class="hidden flex-1 sm:block">
+      <div class="flex items-center gap-3 rounded-sm border border-slate-300 bg-slate-50 px-4 py-2.5 transition-colors duration-300 focus-within:border-accent">
+        <lucide-icon [img]="Search" class="h-4 w-4 flex-shrink-0 text-slate-400" />
+        <input
+          type="text"
+          [value]="searchQuery()"
+          (input)="searchChange.emit($any($event.target).value)"
+          placeholder="Olá, o que você procura?"
+          class="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
+        />
+        @if (searchQuery()) {
+          <button
+            (click)="searchChange.emit('')"
+            class="flex-shrink-0 text-slate-400 transition-colors duration-300 hover:text-slate-900"
+            aria-label="Limpar busca"
+          >
+            <lucide-icon [img]="X" class="h-4 w-4" />
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="ml-auto flex flex-shrink-0 items-center gap-1">
+      <button
+        (click)="toggleSearch()"
+        class="flex h-10 w-10 items-center justify-center rounded-sm transition-colors duration-300 hover:bg-slate-100 sm:hidden"
+        aria-label="Buscar produtos"
+      >
+        <lucide-icon [img]="searchOpen() ? X : Search" class="h-5 w-5 text-slate-900" />
+      </button>
+
+      @if (authService.isAdmin()) {
+        <a
+          routerLink="/admin"
+          class="hidden items-center gap-2 rounded-sm border border-slate-900 px-3 py-2 font-mono text-xs font-bold uppercase tracking-wide text-slate-900 transition-colors duration-300 hover:bg-accent sm:flex"
+        >
+          <lucide-icon [img]="ShieldCheck" class="h-4 w-4" />
+          Painel Admin
+        </a>
+      }
+
+      <div class="relative hidden sm:block">
+        <button
+          (click)="toggleAccountMenu()"
+          class="flex items-center gap-2 rounded-sm px-3 py-2 text-sm font-semibold text-slate-900 transition-colors duration-300 hover:bg-slate-100"
+          [attr.aria-label]="authService.isAuthenticated() ? 'Minha conta' : 'Entrar'"
+        >
+          <lucide-icon [img]="User" class="h-5 w-5" />
+          <span class="hidden lg:inline">
+            {{ authService.isAuthenticated() ? authService.user()?.name : 'Entrar' }}
+          </span>
+        </button>
+
+        @if (accountMenuOpen()) {
+          <div class="absolute right-0 top-full z-20 mt-2 w-80 rounded-sm border border-slate-200 bg-white p-4 shadow-2xl animate-fade-in">
+            @if (authService.isAuthenticated()) {
+              <p class="text-sm text-slate-600">
+                Logado como <span class="font-semibold text-slate-900">{{ authService.user()?.name }}</span>
+              </p>
+              <p class="mt-0.5 text-xs text-slate-500">{{ authService.user()?.email }}</p>
+              <button
+                type="button"
+                (click)="handleLogout()"
+                class="mt-4 w-full rounded-sm border border-slate-300 py-2.5 text-xs font-bold uppercase tracking-wide text-slate-500 transition-colors duration-300 hover:border-slate-900 hover:text-slate-900"
+              >
+                Sair
+              </button>
+            } @else {
+              <form (submit)="handleLoginSubmit($event)" class="flex flex-col gap-3">
+                <input
+                  type="email"
+                  autofocus
+                  [value]="loginEmail()"
+                  (input)="loginEmail.set($any($event.target).value)"
+                  placeholder="E-mail"
+                  required
+                  class="w-full rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent focus:outline-none"
+                />
+                <input
+                  type="password"
+                  [value]="loginPassword()"
+                  (input)="loginPassword.set($any($event.target).value)"
+                  placeholder="Senha"
+                  required
+                  class="w-full rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent focus:outline-none"
+                />
+                @if (authError()) {
+                  <p class="text-xs font-medium text-red-500">{{ authError() }}</p>
+                }
+                <button
+                  type="submit"
+                  [disabled]="authSubmitting()"
+                  class="w-full rounded-sm bg-accent py-2.5 text-xs font-bold uppercase tracking-wide text-black transition-colors duration-300 hover:bg-black hover:text-white disabled:opacity-60"
+                >
+                  {{ authSubmitting() ? 'Entrando...' : 'Entrar' }}
+                </button>
+                <p class="text-center text-xs text-slate-500">
+                  Não tem conta?
+                  <button type="button" (click)="openRegisterModal()" class="font-semibold text-slate-900 underline underline-offset-2">
+                    Criar conta
+                  </button>
+                </p>
+              </form>
+            }
+          </div>
+        }
+      </div>
+
+      <button
+        (click)="cartService.openCart()"
+        class="relative flex h-10 w-10 items-center justify-center rounded-sm transition-colors duration-300 hover:bg-slate-100"
+        aria-label="Abrir carrinho"
+      >
+        <lucide-icon [img]="ShoppingBag" class="h-5 w-5 text-slate-900" />
+        @if (cartService.totalItems() > 0) {
+          <span class="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-sm bg-accent font-mono text-[9px] font-bold text-black">
+            {{ cartService.totalItems() > 9 ? '9+' : cartService.totalItems() }}
+          </span>
+        }
+      </button>
+
+      <button
+        (click)="toggleMobileMenu()"
+        class="flex h-10 w-10 items-center justify-center rounded-sm md:hidden hover:bg-slate-100 transition-colors duration-300"
+        aria-label="Abrir menu"
+      >
+        <lucide-icon [img]="mobileMenuOpen() ? X : Menu" class="h-5 w-5 text-slate-900" />
+      </button>
+    </div>
+  </div>
+
+  @if (searchOpen()) {
+    <div class="border-t border-slate-200 px-4 py-3 sm:hidden animate-fade-in">
+      <div class="mx-auto flex max-w-7xl items-center gap-3">
+        <lucide-icon [img]="Search" class="h-4 w-4 flex-shrink-0 text-slate-400" />
+        <input
+          autofocus
+          type="text"
+          [value]="searchQuery()"
+          (input)="searchChange.emit($any($event.target).value)"
+          placeholder="Buscar produtos..."
+          class="flex-1 bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
+        />
+        @if (searchQuery()) {
+          <button
+            (click)="searchChange.emit('')"
+            class="flex-shrink-0 text-slate-400 transition-colors duration-300 hover:text-slate-900"
+            aria-label="Limpar busca"
+          >
+            <lucide-icon [img]="X" class="h-4 w-4" />
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <nav class="hidden border-t border-slate-200 md:block">
+    <div class="mx-auto flex h-12 max-w-7xl items-center justify-center gap-8 px-4 sm:px-6 lg:px-8">
       <button
         (click)="handleHomeClick()"
         class="group relative py-1 text-sm font-semibold uppercase tracking-wide transition-colors duration-300"
-        [class]="activeCategory() === 'todos' ? 'text-white' : 'text-slate-500 hover:text-white'"
+        [class]="activeCategory() === 'todos' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'"
       >
         Início
         <span
@@ -26,7 +214,7 @@
         <button
           (click)="handleCategoryClick(cat.value)"
           class="group relative py-1 text-sm font-semibold uppercase tracking-wide transition-colors duration-300"
-          [class]="activeCategory() === cat.value ? 'text-white' : 'text-slate-500 hover:text-white'"
+          [class]="activeCategory() === cat.value ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'"
         >
           {{ cat.label }}
           <span
@@ -35,79 +223,15 @@
           ></span>
         </button>
       }
-    </nav>
-
-    <div class="flex flex-shrink-0 items-center gap-1">
-      <button
-        (click)="toggleSearch()"
-        class="flex h-10 w-10 items-center justify-center rounded-sm transition-colors duration-300 hover:bg-slate-900"
-        aria-label="Buscar produtos"
-      >
-        <lucide-icon [img]="searchOpen() ? X : Search" class="h-5 w-5 text-white" />
-      </button>
-
-      <button
-        (click)="showAccountToast()"
-        class="hidden h-10 w-10 items-center justify-center rounded-sm transition-colors duration-300 hover:bg-slate-900 sm:flex"
-        aria-label="Minha conta"
-      >
-        <lucide-icon [img]="User" class="h-5 w-5 text-white" />
-      </button>
-
-      <button
-        (click)="cartService.openCart()"
-        class="relative flex h-10 w-10 items-center justify-center rounded-sm transition-colors duration-300 hover:bg-slate-900"
-        aria-label="Abrir carrinho"
-      >
-        <lucide-icon [img]="ShoppingBag" class="h-5 w-5 text-white" />
-        @if (cartService.totalItems() > 0) {
-          <span class="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-sm bg-accent font-mono text-[9px] font-bold text-black">
-            {{ cartService.totalItems() > 9 ? '9+' : cartService.totalItems() }}
-          </span>
-        }
-      </button>
-
-      <button
-        (click)="toggleMobileMenu()"
-        class="flex h-10 w-10 items-center justify-center rounded-sm md:hidden hover:bg-slate-900 transition-colors duration-300"
-        aria-label="Abrir menu"
-      >
-        <lucide-icon [img]="mobileMenuOpen() ? X : Menu" class="h-5 w-5 text-white" />
-      </button>
     </div>
-  </div>
-
-  @if (searchOpen()) {
-    <div class="border-t border-slate-800 px-4 py-3 sm:px-6 lg:px-8 animate-fade-in">
-      <div class="mx-auto flex max-w-7xl items-center gap-3">
-        <lucide-icon [img]="Search" class="h-4 w-4 flex-shrink-0 text-slate-500" />
-        <input
-          autofocus
-          type="text"
-          [value]="searchQuery()"
-          (input)="searchChange.emit($any($event.target).value)"
-          placeholder="Buscar produtos..."
-          class="flex-1 bg-transparent text-sm text-white placeholder:text-slate-600 focus:outline-none"
-        />
-        @if (searchQuery()) {
-          <button
-            (click)="searchChange.emit('')"
-            class="flex-shrink-0 text-slate-500 transition-colors duration-300 hover:text-white"
-            aria-label="Limpar busca"
-          >
-            <lucide-icon [img]="X" class="h-4 w-4" />
-          </button>
-        }
-      </div>
-    </div>
-  }
+  </nav>
 
   @if (mobileMenuOpen()) {
-    <nav class="flex flex-col border-t border-slate-800 bg-black md:hidden animate-fade-in">
+    <nav class="flex flex-col border-t border-slate-200 bg-white md:hidden animate-fade-in">
       <button
         (click)="handleHomeClick()"
         class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wide transition-colors duration-300"
-        [class]="activeCategory() === 'todos' ? 'bg-slate-900 text-white' : 'text-slate-500'"
+        [class]="activeCategory() === 'todos' ? 'bg-slate-100 text-slate-900' : 'text-slate-500'"
       >
         Início
       </button>
@@ -115,7 +239,7 @@
         <button
           (click)="handleCategoryClick(cat.value)"
           class="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wide transition-colors duration-300"
-          [class]="activeCategory() === cat.value ? 'bg-slate-900 text-white' : 'text-slate-500'"
+          [class]="activeCategory() === cat.value ? 'bg-slate-100 text-slate-900' : 'text-slate-500'"
         >
           {{ cat.label }}
         </button>
@@ -123,3 +247,7 @@
     </nav>
   }
 </header>
+
+@if (registerModalOpen()) {
+  <app-register-modal (close)="registerModalOpen.set(false)" />
+}

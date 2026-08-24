@@ -44,7 +44,7 @@ export class StorefrontPage {
 
   constructor() {
     effect(() => {
-      this.titleService.setTitle(`${this.settingsService.settings().storeName} — Vestuário Urbano`);
+      this.titleService.setTitle(this.settingsService.settings().storeName);
     });
   }
 

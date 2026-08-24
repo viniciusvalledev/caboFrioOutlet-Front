@@ -4,6 +4,7 @@ import { Product, ProductCategory, ProductInput } from '../../../types/product';
 import { ApiService } from '../../../services/api.service';
 import { ToastService } from '../../../services/toast.service';
 import { ApiError } from '../../../services/api-error';
+import { SettingsService } from '../../../services/settings.service';
 
 const CATEGORY_OPTIONS: { label: string; value: ProductCategory }[] = [
   { label: 'Camisas', value: 'camisas' },
@@ -20,6 +21,7 @@ const CATEGORY_OPTIONS: { label: string; value: ProductCategory }[] = [
 export class ProductForm implements OnInit {
   private api = inject(ApiService);
   private toastService = inject(ToastService);
+  private settingsService = inject(SettingsService);
 
   readonly X = X;
   readonly Upload = Upload;
@@ -31,6 +33,12 @@ export class ProductForm implements OnInit {
   formClose = output<void>();
 
   readonly isEditing = computed(() => Boolean(this.product()));
+
+  readonly brandOptions = computed(() => {
+    const brands = this.settingsService.settings().brands;
+    const current = this.brand();
+    return current && !brands.includes(current) ? [...brands, current] : brands;
+  });
 
   name = signal('');
   category = signal<ProductCategory>('camisas');

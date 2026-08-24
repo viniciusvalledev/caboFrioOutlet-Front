@@ -4,11 +4,11 @@
       (click)="categoryChange.emit(filter.value)"
       class="flex items-center gap-1.5 rounded-sm px-4 py-2 text-sm font-semibold transition-all duration-300"
       [class]="activeCategory() === filter.value
-        ? 'bg-white text-black'
-        : 'bg-black text-slate-400 border border-slate-700 hover:border-accent hover:text-accent'"
+        ? 'bg-slate-900 text-white'
+        : 'bg-white text-slate-500 border border-slate-300 hover:border-accent hover:text-slate-900'"
     >
       {{ filter.label }}
-      <span class="font-mono tabular-nums" [class]="activeCategory() === filter.value ? 'text-slate-500' : 'text-slate-600'">
+      <span class="font-mono tabular-nums" [class]="activeCategory() === filter.value ? 'text-slate-400' : 'text-slate-400'">
         {{ counts()[filter.value] }}
       </span>
     </button>

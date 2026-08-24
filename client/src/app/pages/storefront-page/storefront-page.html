@@ -1,19 +1,19 @@
-<div class="flex min-h-screen flex-col bg-black">
+<div class="flex min-h-screen flex-col bg-white">
   <div class="sticky top-0 z-50">
+    <app-announcement-bar />
     <app-navbar
       [activeCategory]="activeCategory()"
       (categoryChange)="activeCategory.set($event)"
       [searchQuery]="searchQuery()"
       (searchChange)="searchQuery.set($event)"
     />
-    <app-announcement-bar />
   </div>
   <app-hero />
   <app-brand-showcase (selectBrand)="activeBrand.set($event)" />
 
   <main id="produtos" class="mx-auto w-full max-w-7xl flex-1 px-4 py-16 sm:px-6 lg:px-8">
     <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <h2 class="text-2xl font-black tracking-tight text-white">
+      <h2 class="text-2xl font-black tracking-tight text-slate-900">
         Nossos Produtos
       </h2>
       <app-category-filter

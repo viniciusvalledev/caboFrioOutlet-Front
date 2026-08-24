@@ -1,20 +1,22 @@
-<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-  <h2 class="mb-5 font-mono text-xs font-bold uppercase tracking-wider text-slate-500">
-    Marcas que trabalhamos
-  </h2>
-  <div class="flex gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-    @for (item of items; track item.label) {
-      <button
-        (click)="handleClick(item.label)"
-        class="group flex h-36 w-56 flex-shrink-0 flex-col items-center justify-center gap-3 rounded-sm border border-slate-800 bg-slate-900 text-left transition-colors duration-300 hover:border-accent sm:h-40 sm:w-64"
-      >
-        <span class="font-display text-3xl font-semibold uppercase tracking-tight text-white transition-colors duration-300 group-hover:text-accent sm:text-4xl">
-          {{ item.label }}
-        </span>
-        <span class="font-mono text-[10px] uppercase tracking-widest text-slate-500 transition-colors duration-300 group-hover:text-slate-300">
-          Ver produtos
-        </span>
-      </button>
-    }
-  </div>
-</section>
+@if (settingsService.settings().brands.length > 0) {
+  <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <h2 class="mb-5 font-mono text-xs font-bold uppercase tracking-wider text-slate-500">
+      Marcas que trabalhamos
+    </h2>
+    <div class="flex gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      @for (brand of settingsService.settings().brands; track brand) {
+        <button
+          (click)="handleClick(brand)"
+          class="group flex h-36 w-56 flex-shrink-0 flex-col items-center justify-center gap-3 rounded-sm border border-slate-200 bg-white text-left transition-colors duration-300 hover:border-accent sm:h-40 sm:w-64"
+        >
+          <span class="font-display text-3xl font-semibold uppercase tracking-tight text-slate-900 sm:text-4xl">
+            {{ brand }}
+          </span>
+          <span class="font-mono text-[10px] uppercase tracking-widest text-slate-400 transition-colors duration-300 group-hover:text-slate-900">
+            Ver produtos
+          </span>
+        </button>
+      }
+    </div>
+  </section>
+}

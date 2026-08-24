@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { LucideAngularModule, Instagram, Facebook, Twitter, ArrowRight } from 'lucide-angular';
+import { LucideAngularModule, Instagram, ArrowRight } from 'lucide-angular';
 import { ToastService } from '../../services/toast.service';
 import { SettingsService, splitStoreName } from '../../services/settings.service';
 
@@ -20,12 +20,11 @@ export class Footer {
   settingsService = inject(SettingsService);
 
   readonly Instagram = Instagram;
-  readonly Facebook = Facebook;
-  readonly Twitter = Twitter;
   readonly ArrowRight = ArrowRight;
   readonly linkColumns = LINK_COLUMNS;
   readonly splitStoreName = splitStoreName;
   readonly currentYear = new Date().getFullYear();
+  readonly instagramUrl = 'https://www.instagram.com/cabofrio.outlet';
 
   email = signal('');
 

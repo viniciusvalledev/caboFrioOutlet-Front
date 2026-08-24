@@ -6,20 +6,20 @@
 ></div>
 
 <aside
-  class="fixed right-0 top-0 z-[70] flex h-full w-full max-w-md flex-col bg-black border-l border-slate-800 shadow-2xl transition-transform duration-300"
+  class="fixed right-0 top-0 z-[70] flex h-full w-full max-w-md flex-col bg-white border-l border-slate-200 shadow-2xl transition-transform duration-300"
   [class]="cartService.isCartOpen() ? 'translate-x-0' : 'translate-x-full'"
   role="dialog"
   aria-modal="true"
   aria-label="Carrinho de compras"
 >
-  <div class="flex items-center justify-between border-b border-slate-800 px-5 py-4">
-    <h2 class="flex items-center gap-2 text-base font-bold text-white">
+  <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+    <h2 class="flex items-center gap-2 text-base font-bold text-slate-900">
       <lucide-icon [img]="ShoppingBag" class="h-5 w-5" />
       Seu Carrinho
     </h2>
     <button
       (click)="cartService.closeCart()"
-      class="flex h-9 w-9 items-center justify-center rounded-sm text-slate-500 transition-colors duration-300 hover:bg-slate-800 hover:text-white"
+      class="flex h-9 w-9 items-center justify-center rounded-sm text-slate-500 transition-colors duration-300 hover:bg-slate-100 hover:text-slate-900"
       aria-label="Fechar carrinho"
     >
       <lucide-icon [img]="X" class="h-5 w-5" />
@@ -28,8 +28,8 @@
 
   @if (cartService.items().length === 0) {
     <div class="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
-      <lucide-icon [img]="ShoppingBag" class="h-12 w-12 text-slate-700" />
-      <p class="text-sm font-medium text-slate-400">Seu carrinho está vazio.</p>
+      <lucide-icon [img]="ShoppingBag" class="h-12 w-12 text-slate-300" />
+      <p class="text-sm font-medium text-slate-500">Seu carrinho está vazio.</p>
       <button
         (click)="cartService.closeCart()"
         class="mt-2 rounded-sm bg-accent px-5 py-2.5 text-sm font-bold text-black transition-all duration-300 hover:bg-accent-hover"
@@ -41,7 +41,7 @@
     <div class="flex-1 overflow-y-auto px-5 py-4">
       <ul class="flex flex-col gap-4">
         @for (item of cartService.items(); track item.product.id + '-' + item.selectedSize) {
-          <li class="flex gap-3 border-b border-slate-800 pb-4">
+          <li class="flex gap-3 border-b border-slate-200 pb-4">
             <img
               [src]="item.product.image"
               [alt]="item.product.name"
@@ -49,7 +49,7 @@
             />
             <div class="flex flex-1 flex-col">
               <div class="flex items-start justify-between gap-2">
-                <p class="text-sm font-semibold leading-snug text-white">
+                <p class="text-sm font-semibold leading-snug text-slate-900">
                   {{ item.product.name }}
                 </p>
                 <button
@@ -60,29 +60,29 @@
                   <lucide-icon [img]="Trash2" class="h-4 w-4" />
                 </button>
               </div>
-              <p class="text-xs text-slate-400">Tamanho: {{ item.selectedSize }}</p>
+              <p class="text-xs text-slate-500">Tamanho: {{ item.selectedSize }}</p>
 
               <div class="mt-2 flex items-center justify-between">
-                <div class="flex items-center gap-1 rounded-sm border border-slate-700 px-1">
+                <div class="flex items-center gap-1 rounded-sm border border-slate-300 px-1">
                   <button
                     (click)="cartService.updateQuantity(item.product.id, item.selectedSize, item.quantity - 1)"
-                    class="flex h-7 w-7 items-center justify-center text-slate-400 transition-colors duration-300 hover:text-white"
+                    class="flex h-7 w-7 items-center justify-center text-slate-400 transition-colors duration-300 hover:text-slate-900"
                     aria-label="Diminuir quantidade"
                   >
                     <lucide-icon [img]="Minus" class="h-3.5 w-3.5" />
                   </button>
-                  <span class="w-6 text-center text-xs font-semibold text-white">
+                  <span class="w-6 text-center text-xs font-semibold text-slate-900">
                     {{ item.quantity }}
                   </span>
                   <button
                     (click)="cartService.updateQuantity(item.product.id, item.selectedSize, item.quantity + 1)"
-                    class="flex h-7 w-7 items-center justify-center text-slate-400 transition-colors duration-300 hover:text-white"
+                    class="flex h-7 w-7 items-center justify-center text-slate-400 transition-colors duration-300 hover:text-slate-900"
                     aria-label="Aumentar quantidade"
                   >
                     <lucide-icon [img]="Plus" class="h-3.5 w-3.5" />
                   </button>
                 </div>
-                <span class="font-mono text-sm font-bold tabular-nums text-white">
+                <span class="font-mono text-sm font-bold tabular-nums text-slate-900">
                   {{ formatPrice(getDiscountedPrice(item.product) * item.quantity) }}
                 </span>
               </div>
@@ -94,10 +94,10 @@
   }
 
   @if (cartService.items().length > 0) {
-    <form (submit)="handleCheckout($event)" class="border-t border-slate-800 px-5 py-4">
+    <form (submit)="handleCheckout($event)" class="border-t border-slate-200 px-5 py-4">
       <div class="mb-4 flex items-center justify-between">
         <span class="text-sm font-medium text-slate-500">Total</span>
-        <span class="font-mono text-xl font-bold tabular-nums text-white">
+        <span class="font-mono text-xl font-bold tabular-nums text-slate-900">
           {{ formatPrice(cartService.totalPrice()) }}
         </span>
       </div>
@@ -108,14 +108,14 @@
           (input)="customerName.set($any($event.target).value)"
           placeholder="Seu nome"
           required
-          class="w-full rounded-sm border border-slate-700 bg-transparent px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-accent focus:outline-none"
+          class="w-full rounded-sm border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent focus:outline-none"
         />
         <input
           [value]="customerContact()"
           (input)="customerContact.set($any($event.target).value)"
           placeholder="WhatsApp ou e-mail"
           required
-          class="w-full rounded-sm border border-slate-700 bg-transparent px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-accent focus:outline-none"
+          class="w-full rounded-sm border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent focus:outline-none"
         />
       </div>
 

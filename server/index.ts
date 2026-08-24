@@ -8,6 +8,8 @@ import { productsRouter } from './routes/products';
 import { ordersRouter } from './routes/orders';
 import { settingsRouter } from './routes/settings';
 import { uploadRouter, UPLOADS_DIR } from './routes/upload';
+import { usersRouter } from './routes/users';
+import { heroSlidesRouter } from './routes/hero-slides';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -23,6 +25,8 @@ app.use('/api/products', productsRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/upload', uploadRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/hero-slides', heroSlidesRouter);
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 

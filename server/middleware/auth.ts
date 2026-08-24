@@ -9,20 +9,50 @@ if (!JWT_SECRET_ENV) {
 
 const JWT_SECRET: string = JWT_SECRET_ENV;
 
-export function requireAdmin(req: Request, res: Response, next: NextFunction) {
+export interface AuthTokenPayload {
+  sub: string;
+  isAdmin: boolean;
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: AuthTokenPayload;
+    }
+  }
+}
+
+function readToken(req: Request): AuthTokenPayload | null {
   const header = req.headers.authorization;
   const token = header?.startsWith('Bearer ') ? header.slice(7) : null;
-
-  if (!token) {
-    return res.status(401).json({ error: 'Autenticação necessária.' });
-  }
+  if (!token) return null;
 
   try {
-    jwt.verify(token, JWT_SECRET);
-    next();
+    return jwt.verify(token, JWT_SECRET) as AuthTokenPayload;
   } catch {
-    return res.status(401).json({ error: 'Sessão inválida ou expirada.' });
+    return null;
   }
+}
+
+export function requireAuth(req: Request, res: Response, next: NextFunction) {
+  const payload = readToken(req);
+  if (!payload) {
+    return res.status(401).json({ error: 'Autenticação necessária.' });
+  }
+  req.user = payload;
+  next();
+}
+
+export function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  const payload = readToken(req);
+  if (!payload) {
+    return res.status(401).json({ error: 'Autenticação necessária.' });
+  }
+  if (!payload.isAdmin) {
+    return res.status(403).json({ error: 'Acesso restrito ao administrador.' });
+  }
+  req.user = payload;
+  next();
 }
 
 export { JWT_SECRET };

@@ -3,11 +3,11 @@ import { Component } from '@angular/core';
 const BANNERS = [
   {
     title: 'Nova Coleção',
-    image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=1200&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1635650804060-bb009bcb2ea5?w=1200&auto=format&fit=crop&q=80',
   },
   {
     title: 'Mais Vendidos',
-    image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=1200&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1574427797991-b086946fa9e7?w=1200&auto=format&fit=crop&q=80',
   },
 ];
 

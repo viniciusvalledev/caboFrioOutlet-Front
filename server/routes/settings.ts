@@ -4,17 +4,26 @@ import { requireAdmin } from '../middleware/auth';
 
 export const settingsRouter = Router();
 
-function serialize(settings: { storeName: string; freeShippingThreshold: number; announcementMessages: string }) {
-  let announcementMessages: string[] = [];
+function parseJsonArray(raw: string): string[] {
   try {
-    announcementMessages = JSON.parse(settings.announcementMessages);
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
-    announcementMessages = [];
+    return [];
   }
+}
+
+function serialize(settings: {
+  storeName: string;
+  freeShippingThreshold: number;
+  announcementMessages: string;
+  brands: string;
+}) {
   return {
     storeName: settings.storeName,
     freeShippingThreshold: settings.freeShippingThreshold,
-    announcementMessages,
+    announcementMessages: parseJsonArray(settings.announcementMessages),
+    brands: parseJsonArray(settings.brands),
   };
 }
 
@@ -22,16 +31,17 @@ settingsRouter.get('/', async (_req, res) => {
   const settings = await prisma.settings.upsert({
     where: { id: 1 },
     update: {},
-    create: { id: 1, announcementMessages: '[]' },
+    create: { id: 1, announcementMessages: '[]', brands: '[]' },
   });
   res.json(serialize(settings));
 });
 
 settingsRouter.put('/', requireAdmin, async (req, res) => {
-  const { storeName, freeShippingThreshold, announcementMessages } = req.body as {
+  const { storeName, freeShippingThreshold, announcementMessages, brands } = req.body as {
     storeName?: string;
     freeShippingThreshold?: number;
     announcementMessages?: string[];
+    brands?: string[];
   };
 
   const settings = await prisma.settings.upsert({
@@ -44,12 +54,14 @@ settingsRouter.put('/', requireAdmin, async (req, res) => {
       ...(Array.isArray(announcementMessages)
         ? { announcementMessages: JSON.stringify(announcementMessages) }
         : {}),
+      ...(Array.isArray(brands) ? { brands: JSON.stringify(brands) } : {}),
     },
     create: {
       id: 1,
       storeName: storeName?.trim() || undefined,
       freeShippingThreshold: freeShippingThreshold || undefined,
       announcementMessages: JSON.stringify(announcementMessages ?? []),
+      brands: JSON.stringify(brands ?? []),
     },
   });
 

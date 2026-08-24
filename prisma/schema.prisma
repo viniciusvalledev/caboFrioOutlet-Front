@@ -61,9 +61,35 @@ model Settings {
   storeName             String @default("Cabo Frio Outlet")
   freeShippingThreshold Float  @default(299)
   announcementMessages  String @db.Text
+  brands                String @db.Text
 }
 
-model Admin {
-  id           Int    @id @default(1)
+model HeroSlide {
+  id        String   @id @default(cuid())
+  image     String
+  eyebrow   String   @default("")
+  title     String
+  highlight String   @default("")
+  subtitle  String   @default("")
+  ctaLabel  String   @default("Ver Coleção")
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
   passwordHash String
+  cpf          String   @unique @default("")
+  phone        String   @default("")
+  cep          String   @default("")
+  street       String   @default("")
+  number       String   @default("")
+  complement   String?
+  neighborhood String   @default("")
+  city         String   @default("")
+  state        String   @default("")
+  isAdmin      Boolean  @default(false)
+  createdAt    DateTime @default(now())
 }

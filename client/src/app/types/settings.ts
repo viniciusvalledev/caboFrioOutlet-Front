@@ -2,6 +2,7 @@ export interface StoreSettings {
   storeName: string;
   freeShippingThreshold: number;
   announcementMessages: string[];
+  brands: string[];
 }
 
 export const DEFAULT_SETTINGS: StoreSettings = {
@@ -12,4 +13,5 @@ export const DEFAULT_SETTINGS: StoreSettings = {
     'Troca grátis em até 30 dias',
     'Novidades toda semana',
   ],
+  brands: ['Nike', 'Adidas', 'High'],
 };

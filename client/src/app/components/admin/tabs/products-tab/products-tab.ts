@@ -60,13 +60,14 @@ export class ProductsTab {
     }
   }
 
-  async handleDelete(product: Product): Promise<void> {
-    if (!window.confirm(`Excluir "${product.name}" do catálogo?`)) return;
-    try {
-      await this.productService.deleteProduct(product.id);
-      this.toastService.showToast('Produto excluído', product.name);
-    } catch (err) {
-      this.toastService.showToast('Erro ao excluir produto', err instanceof ApiError ? err.message : undefined);
-    }
+  handleDelete(product: Product): void {
+    this.toastService.showConfirm(`Excluir "${product.name}" do catálogo?`, 'Essa ação não pode ser desfeita.', async () => {
+      try {
+        await this.productService.deleteProduct(product.id);
+        this.toastService.showToast('Produto excluído', product.name);
+      } catch (err) {
+        this.toastService.showToast('Erro ao excluir produto', err instanceof ApiError ? err.message : undefined);
+      }
+    });
   }
 }

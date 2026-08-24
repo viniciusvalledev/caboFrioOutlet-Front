@@ -1,7 +1,1 @@
-@if (adminAuthService.checking()) {
-  <div class="min-h-screen bg-black"></div>
-} @else if (!adminAuthService.isAuthenticated()) {
-  <app-admin-login />
-} @else {
-  <app-admin-dashboard />
-}
+<app-admin-dashboard />

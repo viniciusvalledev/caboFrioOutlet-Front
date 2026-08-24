@@ -1,0 +1,166 @@
+<div class="fixed inset-0 z-[80] bg-slate-900/60" (click)="close.emit()" aria-hidden="true"></div>
+
+<div class="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto p-4 sm:items-center sm:p-6">
+  <div class="w-full max-w-lg rounded-sm border border-slate-200 bg-white shadow-2xl" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+      <h2 class="font-display text-lg font-semibold uppercase tracking-tight text-slate-900">Criar conta</h2>
+      <button
+        (click)="close.emit()"
+        class="flex h-9 w-9 items-center justify-center rounded-sm text-slate-500 transition-colors duration-300 hover:bg-slate-100 hover:text-slate-900"
+        aria-label="Fechar"
+      >
+        <lucide-icon [img]="X" class="h-5 w-5" />
+      </button>
+    </div>
+
+    <form (submit)="handleSubmit($event)" class="flex flex-col gap-5 px-6 py-6">
+      <div>
+        <h3 class="mb-3 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500">Dados pessoais</h3>
+        <div class="flex flex-col gap-3">
+          <input
+            type="text"
+            autofocus
+            [value]="name()"
+            (input)="name.set($any($event.target).value)"
+            placeholder="Nome completo"
+            required
+            class="w-full rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent focus:outline-none"
+          />
+          <div class="grid grid-cols-2 gap-3">
+            <input
+              type="email"
+              [value]="email()"
+              (input)="email.set($any($event.target).value)"
+              placeholder="E-mail"
+              required
+              class="w-full rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent focus:outline-none"
+            />
+            <input
+              type="password"
+              [value]="password()"
+              (input)="password.set($any($event.target).value)"
+              placeholder="Senha (mín. 6 caracteres)"
+              required
+              class="w-full rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent focus:outline-none"
+            />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <input
+              type="text"
+              inputmode="numeric"
+              [value]="cpf()"
+              (input)="onCpfInput($any($event.target).value)"
+              placeholder="CPF"
+              required
+              class="w-full rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent focus:outline-none"
+            />
+            <input
+              type="tel"
+              inputmode="numeric"
+              [value]="phone()"
+              (input)="onPhoneInput($any($event.target).value)"
+              placeholder="(00) 00000-0000"
+              maxlength="15"
+              required
+              class="w-full rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent focus:outline-none"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="mb-3 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500">Endereço</h3>
+        <div class="flex flex-col gap-3">
+          <div class="relative">
+            <input
+              type="text"
+              inputmode="numeric"
+              [value]="cep()"
+              (input)="onCepInput($any($event.target).value)"
+              placeholder="CEP"
+              required
+              class="w-full rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent focus:outline-none"
+            />
+            @if (cepLookupState() === 'loading') {
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] uppercase text-slate-400">
+                Buscando...
+              </span>
+            }
+            @if (cepLookupState() === 'not-found') {
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] uppercase text-red-500">
+                CEP não encontrado
+              </span>
+            }
+          </div>
+
+          <div class="grid grid-cols-[1fr_auto] gap-3">
+            <input
+              type="text"
+              [value]="street()"
+              (input)="street.set($any($event.target).value)"
+              placeholder="Rua"
+              required
+              class="w-full rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent focus:outline-none"
+            />
+            <input
+              type="text"
+              [value]="number()"
+              (input)="number.set($any($event.target).value)"
+              placeholder="Número"
+              required
+              class="w-24 rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent focus:outline-none"
+            />
+          </div>
+
+          <input
+            type="text"
+            [value]="complement()"
+            (input)="complement.set($any($event.target).value)"
+            placeholder="Complemento (opcional)"
+            class="w-full rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent focus:outline-none"
+          />
+
+          <div class="grid grid-cols-[1fr_1fr_auto] gap-3">
+            <input
+              type="text"
+              [value]="neighborhood()"
+              (input)="neighborhood.set($any($event.target).value)"
+              placeholder="Bairro"
+              required
+              class="w-full rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent focus:outline-none"
+            />
+            <input
+              type="text"
+              [value]="city()"
+              (input)="city.set($any($event.target).value)"
+              placeholder="Cidade"
+              required
+              class="w-full rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent focus:outline-none"
+            />
+            <input
+              type="text"
+              maxlength="2"
+              [value]="state()"
+              (input)="state.set($any($event.target).value)"
+              placeholder="UF"
+              required
+              class="w-16 rounded-sm border border-slate-300 bg-white px-3 py-2.5 text-center text-sm uppercase text-slate-900 placeholder:text-slate-400 focus:border-accent focus:outline-none"
+            />
+          </div>
+        </div>
+      </div>
+
+      @if (error()) {
+        <p class="text-xs font-medium text-red-500">{{ error() }}</p>
+      }
+
+      <button
+        type="submit"
+        [disabled]="submitting()"
+        class="w-full rounded-sm bg-accent py-3 text-sm font-bold uppercase tracking-wide text-black transition-colors duration-300 hover:bg-black hover:text-white disabled:opacity-60"
+      >
+        {{ submitting() ? 'Criando conta...' : 'Criar conta' }}
+      </button>
+    </form>
+  </div>
+</div>

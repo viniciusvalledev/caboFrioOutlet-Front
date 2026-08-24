@@ -20,6 +20,8 @@ export class SettingsTab implements OnInit {
   threshold = signal('');
   messages = signal<string[]>([]);
   messageInput = signal('');
+  brands = signal<string[]>([]);
+  brandInput = signal('');
   saving = signal(false);
 
   ngOnInit(): void {
@@ -27,6 +29,7 @@ export class SettingsTab implements OnInit {
     this.storeName.set(settings.storeName);
     this.threshold.set(String(settings.freeShippingThreshold));
     this.messages.set(settings.announcementMessages);
+    this.brands.set(settings.brands);
   }
 
   addMessage(): void {
@@ -47,6 +50,27 @@ export class SettingsTab implements OnInit {
     }
   }
 
+  addBrand(): void {
+    const value = this.brandInput().trim();
+    if (!value || this.brands().includes(value)) {
+      this.brandInput.set('');
+      return;
+    }
+    this.brands.update((prev) => [...prev, value]);
+    this.brandInput.set('');
+  }
+
+  removeBrand(index: number): void {
+    this.brands.update((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  onBrandInputKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.addBrand();
+    }
+  }
+
   async handleSubmit(event: Event): Promise<void> {
     event.preventDefault();
     const current = this.settingsService.settings();
@@ -58,6 +82,7 @@ export class SettingsTab implements OnInit {
         storeName: this.storeName().trim() || current.storeName,
         freeShippingThreshold: thresholdNum > 0 ? thresholdNum : current.freeShippingThreshold,
         announcementMessages: this.messages(),
+        brands: this.brands(),
       });
       this.toastService.showToast('Configurações salvas!', 'As alterações já estão valendo na loja.');
     } catch (err) {

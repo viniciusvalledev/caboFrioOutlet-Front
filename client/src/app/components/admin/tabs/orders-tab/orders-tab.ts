@@ -15,11 +15,11 @@ const STATUS_OPTIONS: { value: OrderStatus; label: string }[] = [
 ];
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
-  pendente: 'bg-yellow-400/10 text-yellow-400',
-  confirmado: 'bg-blue-400/10 text-blue-400',
-  enviado: 'bg-purple-400/10 text-purple-400',
-  entregue: 'bg-emerald-500/10 text-emerald-400',
-  cancelado: 'bg-red-500/10 text-red-400',
+  pendente: 'bg-yellow-100 text-yellow-800',
+  confirmado: 'bg-blue-100 text-blue-700',
+  enviado: 'bg-purple-100 text-purple-700',
+  entregue: 'bg-emerald-50 text-emerald-600',
+  cancelado: 'bg-red-50 text-red-600',
 };
 
 function formatPrice(value: number): string {

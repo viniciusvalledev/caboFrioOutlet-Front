@@ -1,16 +1,16 @@
 <div class="fixed top-4 right-4 z-[100] flex flex-col gap-2 w-[calc(100%-2rem)] max-w-sm">
-  @for (toast of toastService.toasts(); track toast.id) {
-    <div class="animate-toast-in flex items-start gap-3 rounded-sm border border-slate-700 bg-black text-white px-4 py-3 shadow-xl">
-      <lucide-icon [img]="CircleCheckBig" class="h-5 w-5 flex-shrink-0 text-accent mt-0.5" />
+  @for (toast of infoToasts(); track toast.id) {
+    <div class="animate-toast-in flex items-start gap-3 rounded-sm border border-slate-200 bg-white text-slate-900 px-4 py-3 shadow-xl">
+      <lucide-icon [img]="CircleCheckBig" class="h-5 w-5 flex-shrink-0 text-slate-900 mt-0.5" />
       <div class="flex-1 min-w-0">
         <p class="text-sm font-semibold leading-tight">{{ toast.title }}</p>
         @if (toast.description) {
-          <p class="text-xs text-slate-300 mt-0.5 leading-snug">{{ toast.description }}</p>
+          <p class="text-xs text-slate-500 mt-0.5 leading-snug">{{ toast.description }}</p>
         }
       </div>
       <button
         (click)="toastService.dismissToast(toast.id)"
-        class="flex-shrink-0 text-slate-400 hover:text-white transition-colors"
+        class="flex-shrink-0 text-slate-400 hover:text-slate-900 transition-colors"
         aria-label="Fechar notificação"
       >
         <lucide-icon [img]="X" class="h-4 w-4" />
@@ -18,3 +18,40 @@
     </div>
   }
 </div>
+
+@if (confirmToasts().length > 0) {
+  <div
+    class="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/50 p-4"
+    (click)="toastService.dismissToast(confirmToasts()[0].id)"
+  >
+    <div class="flex w-full max-w-sm flex-col gap-3" (click)="$event.stopPropagation()">
+      @for (toast of confirmToasts(); track toast.id) {
+        <div class="animate-toast-in flex flex-col gap-3 rounded-sm border border-slate-200 bg-white p-5 text-slate-900 shadow-2xl">
+          <div class="flex items-start gap-3">
+            <lucide-icon [img]="TriangleAlert" class="h-5 w-5 flex-shrink-0 text-red-500 mt-0.5" />
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold leading-tight">{{ toast.title }}</p>
+              @if (toast.description) {
+                <p class="text-xs text-slate-500 mt-0.5 leading-snug">{{ toast.description }}</p>
+              }
+            </div>
+          </div>
+          <div class="flex justify-end gap-2 pt-1">
+            <button
+              (click)="toastService.dismissToast(toast.id)"
+              class="rounded-sm border border-slate-300 px-4 py-2 text-xs font-bold uppercase tracking-wide text-slate-600 transition-colors duration-300 hover:border-slate-900 hover:text-slate-900"
+            >
+              {{ toast.cancelLabel }}
+            </button>
+            <button
+              (click)="toastService.confirmToast(toast.id)"
+              class="rounded-sm bg-red-500 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white transition-colors duration-300 hover:bg-red-600"
+            >
+              {{ toast.confirmLabel }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}
