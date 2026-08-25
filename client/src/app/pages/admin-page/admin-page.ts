@@ -14,7 +14,7 @@ export class AdminPage {
 
   constructor() {
     effect(() => {
-      this.titleService.setTitle(`${this.settingsService.settings().storeName} — Painel Admin`);
+      this.titleService.setTitle(`${this.settingsService.settings().storeName} | admin dashboard`);
     });
   }
 }
