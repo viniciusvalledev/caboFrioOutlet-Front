@@ -101,10 +101,17 @@
                 Logado como <span class="font-semibold text-slate-900">{{ authService.user()?.name }}</span>
               </p>
               <p class="mt-0.5 text-xs text-slate-500">{{ authService.user()?.email }}</p>
+              <a
+                routerLink="/minha-conta"
+                (click)="accountMenuOpen.set(false)"
+                class="mt-4 flex w-full items-center justify-center rounded-sm bg-slate-900 py-2.5 text-xs font-bold uppercase tracking-wide text-white transition-colors duration-300 hover:bg-accent hover:text-black"
+              >
+                Meus pedidos
+              </a>
               <button
                 type="button"
                 (click)="handleLogout()"
-                class="mt-4 w-full rounded-sm border border-slate-300 py-2.5 text-xs font-bold uppercase tracking-wide text-slate-500 transition-colors duration-300 hover:border-slate-900 hover:text-slate-900"
+                class="mt-2 w-full rounded-sm border border-slate-300 py-2.5 text-xs font-bold uppercase tracking-wide text-slate-500 transition-colors duration-300 hover:border-slate-900 hover:text-slate-900"
               >
                 Sair
               </button>

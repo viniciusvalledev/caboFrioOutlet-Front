@@ -1,0 +1,285 @@
+<div class="flex min-h-screen flex-col bg-white">
+  <div class="sticky top-0 z-50">
+    <app-navbar
+      [activeCategory]="activeCategory()"
+      (categoryChange)="handleCategoryChange()"
+      [searchQuery]="searchQuery()"
+      (searchChange)="searchQuery.set($event)"
+    />
+  </div>
+
+  <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-[280px_1fr]">
+      <aside class="flex flex-col gap-px overflow-hidden rounded-sm border border-slate-200 bg-white">
+        <div class="flex items-center gap-3 border-b border-slate-200 px-5 py-5">
+          <span class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-sm bg-slate-900 font-display text-lg font-semibold text-white">
+            {{ authService.user()?.name?.charAt(0)?.toUpperCase() }}
+          </span>
+          <div class="min-w-0">
+            <p class="truncate text-sm font-semibold text-slate-900">
+              {{ authService.user()?.name }}
+            </p>
+            <p class="truncate text-xs text-slate-500">{{ authService.user()?.email }}</p>
+          </div>
+        </div>
+
+        <nav class="flex flex-col">
+          <button
+            (click)="section.set('pedidos')"
+            class="flex items-center gap-3 px-5 py-3.5 text-left text-sm font-semibold transition-colors duration-300"
+            [class]="section() === 'pedidos' ? 'bg-slate-50 text-slate-900' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'"
+          >
+            <lucide-icon [img]="Package" class="h-4 w-4" />
+            Meus pedidos
+          </button>
+          <button
+            (click)="section.set('dados')"
+            class="flex items-center gap-3 px-5 py-3.5 text-left text-sm font-semibold transition-colors duration-300"
+            [class]="section() === 'dados' ? 'bg-slate-50 text-slate-900' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'"
+          >
+            <lucide-icon [img]="User" class="h-4 w-4" />
+            Meus dados
+          </button>
+          <button
+            (click)="section.set('enderecos')"
+            class="flex items-center gap-3 px-5 py-3.5 text-left text-sm font-semibold transition-colors duration-300"
+            [class]="section() === 'enderecos' ? 'bg-slate-50 text-slate-900' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'"
+          >
+            <lucide-icon [img]="MapPin" class="h-4 w-4" />
+            Meu endereço
+          </button>
+          <button
+            (click)="handleLogout()"
+            class="flex items-center gap-3 border-t border-slate-200 px-5 py-3.5 text-left text-sm font-semibold text-slate-500 transition-colors duration-300 hover:bg-red-50 hover:text-red-600"
+          >
+            <lucide-icon [img]="LogOut" class="h-4 w-4" />
+            Sair
+          </button>
+        </nav>
+      </aside>
+
+      <section>
+        @switch (section()) {
+          @case ('pedidos') {
+            <h1 class="mb-6 font-display text-2xl font-semibold tracking-tight text-slate-900">
+              Meus pedidos
+            </h1>
+
+            @if (ordersLoading()) {
+              <p class="py-16 text-center text-sm text-slate-500">Carregando pedidos...</p>
+            } @else if (orders().length === 0) {
+              <div class="rounded-sm border border-dashed border-slate-300 py-16 text-center">
+                <p class="text-sm font-medium text-slate-500">Você ainda não fez nenhum pedido.</p>
+              </div>
+            } @else {
+              <div class="flex flex-col gap-3">
+                @for (order of orders(); track order.id) {
+                  <div class="overflow-hidden rounded-sm border border-slate-200">
+                    <button
+                      (click)="toggleOrder(order.id)"
+                      class="flex w-full flex-col gap-3 px-5 py-4 text-left sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div>
+                        <p class="font-mono text-sm font-bold text-slate-900">
+                          #{{ order.id.slice(-6).toUpperCase() }}
+                        </p>
+                        <p class="mt-0.5 text-xs text-slate-500">{{ formatDate(order.createdAt) }}</p>
+                      </div>
+                      <div class="flex items-center gap-3">
+                        <span class="font-mono text-sm font-bold tabular-nums text-slate-900">
+                          {{ formatPrice(order.total) }}
+                        </span>
+                        <span
+                          class="rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide"
+                          [class]="statusStyles[order.status]"
+                        >
+                          {{ statusLabels[order.status] }}
+                        </span>
+                        <lucide-icon
+                          [img]="expandedOrderId() === order.id ? ChevronUp : ChevronDown"
+                          class="h-4 w-4 text-slate-400"
+                        />
+                      </div>
+                    </button>
+
+                    @if (expandedOrderId() === order.id) {
+                      <div class="border-t border-slate-100 px-5 py-4">
+                        <ul class="flex flex-col gap-3">
+                          @for (item of order.items; track item.id) {
+                            <li class="flex items-center gap-3 text-sm">
+                              <img [src]="item.image" alt="" class="h-14 w-11 flex-shrink-0 rounded-sm object-cover" />
+                              <div class="flex-1">
+                                <p class="font-semibold text-slate-900">{{ item.productName }}</p>
+                                <p class="text-xs text-slate-500">Tam. {{ item.size }} · Qtd {{ item.quantity }}</p>
+                              </div>
+                              <span class="font-mono font-semibold tabular-nums text-slate-900">
+                                {{ formatPrice(item.unitPrice * item.quantity) }}
+                              </span>
+                            </li>
+                          }
+                        </ul>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          }
+
+          @case ('dados') {
+            <h1 class="mb-6 font-display text-2xl font-semibold tracking-tight text-slate-900">
+              Meus dados
+            </h1>
+            <form (submit)="handleProfileSubmit($event)" class="flex max-w-md flex-col gap-4">
+              <div>
+                <label class="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">Nome</label>
+                <input
+                  [value]="name()"
+                  (input)="name.set($any($event.target).value)"
+                  required
+                  class="w-full rounded-sm border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-accent focus:outline-none"
+                />
+              </div>
+              <div>
+                <label class="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">E-mail</label>
+                <input
+                  type="email"
+                  [value]="email()"
+                  (input)="email.set($any($event.target).value)"
+                  required
+                  class="w-full rounded-sm border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-accent focus:outline-none"
+                />
+              </div>
+              <div>
+                <label class="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">Telefone</label>
+                <input
+                  type="tel"
+                  inputmode="numeric"
+                  [value]="phone()"
+                  (input)="onPhoneInput($any($event.target).value)"
+                  maxlength="15"
+                  required
+                  class="w-full rounded-sm border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-accent focus:outline-none"
+                />
+              </div>
+              <div>
+                <label class="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">CPF</label>
+                <input
+                  [value]="authService.user()?.cpf"
+                  disabled
+                  class="w-full rounded-sm border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-400"
+                />
+              </div>
+              <button
+                type="submit"
+                [disabled]="savingProfile()"
+                class="mt-2 self-start rounded-sm bg-accent px-6 py-3 text-xs font-bold uppercase tracking-wide text-black transition-colors duration-300 hover:bg-slate-900 hover:text-white disabled:opacity-60"
+              >
+                {{ savingProfile() ? 'Salvando...' : 'Salvar alterações' }}
+              </button>
+            </form>
+          }
+
+          @case ('enderecos') {
+            <h1 class="mb-6 font-display text-2xl font-semibold tracking-tight text-slate-900">
+              Meu endereço
+            </h1>
+            <form (submit)="handleProfileSubmit($event)" class="flex max-w-md flex-col gap-4">
+              <div class="relative">
+                <label class="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">CEP</label>
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  [value]="cep()"
+                  (input)="onCepInput($any($event.target).value)"
+                  required
+                  class="w-full rounded-sm border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-accent focus:outline-none"
+                />
+                @if (cepLookupState() === 'loading') {
+                  <span class="absolute right-3 top-9 font-mono text-[10px] uppercase text-slate-400">Buscando...</span>
+                }
+                @if (cepLookupState() === 'not-found') {
+                  <span class="absolute right-3 top-9 font-mono text-[10px] uppercase text-red-500">Não encontrado</span>
+                }
+              </div>
+
+              <div class="grid grid-cols-[1fr_auto] gap-3">
+                <div>
+                  <label class="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">Rua</label>
+                  <input
+                    [value]="street()"
+                    (input)="street.set($any($event.target).value)"
+                    required
+                    class="w-full rounded-sm border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-accent focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label class="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">Número</label>
+                  <input
+                    [value]="number()"
+                    (input)="number.set($any($event.target).value)"
+                    required
+                    class="w-24 rounded-sm border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-accent focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label class="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                  Complemento (opcional)
+                </label>
+                <input
+                  [value]="complement()"
+                  (input)="complement.set($any($event.target).value)"
+                  class="w-full rounded-sm border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-accent focus:outline-none"
+                />
+              </div>
+
+              <div class="grid grid-cols-[1fr_1fr_auto] gap-3">
+                <div>
+                  <label class="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">Bairro</label>
+                  <input
+                    [value]="neighborhood()"
+                    (input)="neighborhood.set($any($event.target).value)"
+                    required
+                    class="w-full rounded-sm border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-accent focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label class="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">Cidade</label>
+                  <input
+                    [value]="city()"
+                    (input)="city.set($any($event.target).value)"
+                    required
+                    class="w-full rounded-sm border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-accent focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label class="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">UF</label>
+                  <input
+                    maxlength="2"
+                    [value]="state()"
+                    (input)="state.set($any($event.target).value)"
+                    required
+                    class="w-16 rounded-sm border border-slate-300 bg-white px-3.5 py-2.5 text-center text-sm uppercase text-slate-900 focus:border-accent focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                [disabled]="savingProfile()"
+                class="mt-2 self-start rounded-sm bg-accent px-6 py-3 text-xs font-bold uppercase tracking-wide text-black transition-colors duration-300 hover:bg-slate-900 hover:text-white disabled:opacity-60"
+              >
+                {{ savingProfile() ? 'Salvando...' : 'Salvar alterações' }}
+              </button>
+            </form>
+          }
+        }
+      </section>
+    </div>
+  </main>
+
+  <app-footer />
+  <app-cart-drawer />
+</div>

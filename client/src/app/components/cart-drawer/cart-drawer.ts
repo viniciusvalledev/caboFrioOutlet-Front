@@ -51,7 +51,7 @@ export class CartDrawer {
         })),
       });
 
-      this.toastService.showToast('Pedido confirmado!', 'Em breve você receberá os detalhes por e-mail.');
+      this.toastService.showToast('Pedido confirmado!', 'Em breve entraremos em contato com você.');
       this.cartService.clearCart();
       this.customerName.set('');
       this.customerContact.set('');

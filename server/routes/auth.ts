@@ -104,7 +104,8 @@ authRouter.post('/register', async (req, res) => {
     res.status(201).json({ token, user: serializeUser(user) });
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-      const target = (err.meta?.target as string[] | undefined)?.join(',') ?? '';
+      const rawTarget = err.meta?.target;
+      const target = Array.isArray(rawTarget) ? rawTarget.join(',') : String(rawTarget ?? '');
       if (target.includes('cpf')) {
         return res.status(409).json({ error: 'Já existe uma conta com esse CPF.' });
       }
@@ -140,4 +141,66 @@ authRouter.get('/me', requireAuth, async (req, res) => {
     return res.status(401).json({ error: 'Sessão inválida ou expirada.' });
   }
   res.json({ user: serializeUser(user) });
+});
+
+interface UpdateMePayload {
+  name?: string;
+  email?: string;
+  phone?: string;
+  cep?: string;
+  street?: string;
+  number?: string;
+  complement?: string;
+  neighborhood?: string;
+  city?: string;
+  state?: string;
+}
+
+authRouter.put('/me', requireAuth, async (req, res) => {
+  const body = req.body as UpdateMePayload;
+  const cep = body.cep ? body.cep.replace(/\D/g, '') : '';
+  const state = body.state?.trim().toUpperCase() ?? '';
+
+  if (!body.name?.trim()) {
+    return res.status(400).json({ error: 'Informe seu nome.' });
+  }
+  if (!body.email?.trim() || !EMAIL_REGEX.test(body.email.trim())) {
+    return res.status(400).json({ error: 'Informe um e-mail válido.' });
+  }
+  if (!body.phone?.trim() || body.phone.replace(/\D/g, '').length < 10) {
+    return res.status(400).json({ error: 'Informe um telefone válido.' });
+  }
+  if (!cep || cep.length !== 8) {
+    return res.status(400).json({ error: 'Informe um CEP válido.' });
+  }
+  if (!body.street?.trim() || !body.number?.trim() || !body.neighborhood?.trim() || !body.city?.trim()) {
+    return res.status(400).json({ error: 'Preencha o endereço completo.' });
+  }
+  if (!UF_REGEX.test(state)) {
+    return res.status(400).json({ error: 'Informe a UF do estado (ex: RJ).' });
+  }
+
+  try {
+    const user = await prisma.user.update({
+      where: { id: req.user!.sub },
+      data: {
+        name: body.name.trim(),
+        email: body.email.trim().toLowerCase(),
+        phone: body.phone.trim(),
+        cep,
+        street: body.street.trim(),
+        number: body.number.trim(),
+        complement: body.complement?.trim() || null,
+        neighborhood: body.neighborhood.trim(),
+        city: body.city.trim(),
+        state,
+      },
+    });
+    res.json({ user: serializeUser(user) });
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      return res.status(409).json({ error: 'Já existe uma conta com esse e-mail.' });
+    }
+    throw err;
+  }
 });

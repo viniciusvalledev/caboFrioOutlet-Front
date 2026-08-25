@@ -30,6 +30,8 @@ app.use('/api/hero-slides', heroSlidesRouter);
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
+app.use('/api', (_req, res) => res.status(404).json({ error: 'Rota não encontrada.' }));
+
 // Serve o build do Angular (client/dist/client/browser) e faz fallback de SPA
 // para qualquer rota que não seja /api ou /uploads.
 const clientDist = path.join(__dirname, '..', 'client', 'dist', 'client', 'browser');

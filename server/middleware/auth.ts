@@ -43,6 +43,13 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+/** Anexa o usuário logado se houver token válido, mas nunca bloqueia a requisição (usado no checkout, que também aceita visitantes). */
+export function optionalAuth(req: Request, _res: Response, next: NextFunction) {
+  const payload = readToken(req);
+  if (payload) req.user = payload;
+  next();
+}
+
 export function requireAdmin(req: Request, res: Response, next: NextFunction) {
   const payload = readToken(req);
   if (!payload) {

@@ -1,10 +1,3 @@
-export interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
-  isAdmin: boolean;
-}
-
 export interface CustomerProfile {
   id: string;
   name: string;
@@ -27,6 +20,19 @@ export interface RegisterInput {
   email: string;
   password: string;
   cpf: string;
+  phone: string;
+  cep: string;
+  street: string;
+  number: string;
+  complement?: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+}
+
+export interface ProfileInput {
+  name: string;
+  email: string;
   phone: string;
   cep: string;
   street: string;

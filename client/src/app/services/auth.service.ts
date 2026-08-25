@@ -1,13 +1,13 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { ApiService } from './api.service';
-import { AuthUser, RegisterInput } from '../types/user';
+import { CustomerProfile, ProfileInput, RegisterInput } from '../types/user';
 import { clearToken, getToken, setToken } from './token';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private api = inject(ApiService);
 
-  private _user = signal<AuthUser | null>(null);
+  private _user = signal<CustomerProfile | null>(null);
   private _checking = signal(true);
 
   readonly user = this._user.asReadonly();
@@ -26,7 +26,7 @@ export class AuthService {
       return;
     }
     this.ready = this.api
-      .get<{ user: AuthUser }>('/auth/me')
+      .get<{ user: CustomerProfile }>('/auth/me')
       .then(({ user }) => this._user.set(user))
       .catch(() => clearToken())
       .finally(() => this._checking.set(false));
@@ -37,7 +37,7 @@ export class AuthService {
   }
 
   async login(email: string, password: string): Promise<void> {
-    const { token, user } = await this.api.post<{ token: string; user: AuthUser }>('/auth/login', {
+    const { token, user } = await this.api.post<{ token: string; user: CustomerProfile }>('/auth/login', {
       email,
       password,
     });
@@ -46,8 +46,16 @@ export class AuthService {
   }
 
   async register(input: RegisterInput): Promise<void> {
-    const { token, user } = await this.api.post<{ token: string; user: AuthUser }>('/auth/register', input);
+    const { token, user } = await this.api.post<{ token: string; user: CustomerProfile }>(
+      '/auth/register',
+      input
+    );
     setToken(token);
+    this._user.set(user);
+  }
+
+  async updateProfile(input: ProfileInput): Promise<void> {
+    const { user } = await this.api.put<{ user: CustomerProfile }>('/auth/me', input);
     this._user.set(user);
   }
 

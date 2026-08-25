@@ -19,4 +19,5 @@ export interface Order {
   items: OrderItem[];
   total: number;
   status: OrderStatus;
+  userId?: string | null;
 }

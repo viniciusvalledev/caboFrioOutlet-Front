@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../db';
-import { requireAdmin } from '../middleware/auth';
+import { requireAdmin, requireAuth, optionalAuth } from '../middleware/auth';
 
 export const ordersRouter = Router();
 
@@ -21,9 +21,20 @@ ordersRouter.get('/', requireAdmin, async (_req, res) => {
   res.json(orders);
 });
 
+// Pedidos do cliente logado (usados na tela "Meus pedidos").
+ordersRouter.get('/mine', requireAuth, async (req, res) => {
+  const orders = await prisma.order.findMany({
+    where: { userId: req.user!.sub },
+    include: { items: true },
+    orderBy: { createdAt: 'desc' },
+  });
+  res.json(orders);
+});
+
 // Cria o pedido, calcula os preços a partir do catálogo (nunca confia no preço enviado
 // pelo cliente) e baixa o estoque de forma atômica — se faltar estoque, tudo é revertido.
-ordersRouter.post('/', async (req, res) => {
+// Aceita tanto clientes logados (o pedido fica vinculado à conta) quanto visitantes.
+ordersRouter.post('/', optionalAuth, async (req, res) => {
   const { customerName, customerContact, items } = req.body as {
     customerName?: string;
     customerContact?: string;
@@ -84,6 +95,7 @@ ordersRouter.post('/', async (req, res) => {
           total,
           status: 'pendente',
           items: { create: orderItemsData },
+          userId: req.user?.sub,
         },
         include: { items: true },
       });

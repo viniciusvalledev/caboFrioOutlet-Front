@@ -41,6 +41,8 @@ model Order {
   status          String      @default("pendente")
   createdAt       DateTime    @default(now())
   items           OrderItem[]
+  user            User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId          String?
 }
 
 model OrderItem {
@@ -92,4 +94,5 @@ model User {
   state        String   @default("")
   isAdmin      Boolean  @default(false)
   createdAt    DateTime @default(now())
+  orders       Order[]
 }
